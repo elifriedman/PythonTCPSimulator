@@ -20,7 +20,7 @@
 
   <rect class="paper" width="1000" height="540"/>
   <text x="55" y="45" class="section">TEST2 / NETWORK TOPOLOGY</text>
-  <text x="55" y="73" class="ink" style="font: 600 26px Arial, sans-serif">Two paths between H1 and H2</text>
+  <text x="55" y="73" class="ink" font-family="Arial, sans-serif" font-size="26" font-weight="600">Two paths between H1 and H2</text>
   <text x="55" y="96" class="caption">R1 and R4 are connected through parallel router paths; routing cost is one hop per link.</text>
 
   <!-- Links are drawn first so node boxes remain legible. All non-horizontal paths use rounded elbows. -->
