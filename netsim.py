@@ -67,7 +67,7 @@ class Sim:
 import sys
 if __name__=='__main__':
   if len(sys.argv) < 3:
-    print "usage: python netsim.py Folder time"
+    print("usage: python netsim.py Folder time")
     sys.exit(0)
   folder = sys.argv[1]+'/'
   netfile = folder+'netfile.csv'

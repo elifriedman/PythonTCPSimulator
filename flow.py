@@ -134,7 +134,7 @@ class Flow:
           if self.cwnd >= self.ssthresh: # SS -> CA
             self.state = CA
           if self.ackCounter > 3:
-            print "TRIPACK,%f,%s,%d" % (self.env.now,self.name,ackpkt.getAckNum())
+            print("TRIPACK,%f,%s,%d" % (self.env.now,self.name,ackpkt.getAckNum()))
             self.ssthresh = self.cwnd/2
             if self.tcptype == 'tahoe':
               self.cwnd = 1
@@ -160,13 +160,13 @@ class Flow:
           self.lastMeas = self.env.now
           self.nextMeas = self.env.now + 1.0
 
-        print "FLOW,%f,%s,%d,%d,%f,%f,%s" % (self.env.now,self.name,
+        print("FLOW,%f,%s,%d,%d,%f,%f,%s" % (self.env.now,self.name,
                                              self.cwnd,self.data,
                                              self.estRTT,self.flowrate,
-                                             state2str(self.state))
+                                             state2str(self.state)))
 
       except simpy.Interrupt: # TIMEOUT!
-        print "TIME,%f,%s,%d" % (self.env.now,self.name,self.sentpackets[0].getSeqNum())
+        print("TIME,%f,%s,%d" % (self.env.now,self.name,self.sentpackets[0].getSeqNum()))
         self.ssthresh = self.cwnd/2
         self.cwnd = 1
         self.ackCounter = 0

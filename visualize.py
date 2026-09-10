@@ -13,12 +13,13 @@ def viscwn(logfile):
       blah,time,name,cwnd,data,rtt,rate,state = line.split(',')
       if name not in flows:
         flows[name] = [[],[],[],[],[],[]]
-      flows[name][0].append(time)
-      flows[name][1].append(cwnd)
-      flows[name][2].append(data)
-      flows[name][3].append(rtt)
-      flows[name][4].append(rate)
+      flows[name][0].append(float(time))
+      flows[name][1].append(float(cwnd))
+      flows[name][2].append(int(data))
+      flows[name][3].append(float(rtt))
+      flows[name][4].append(float(rate))
       flows[name][5].append(state)
+  f.close()
   return flows
 
 def visbuf(logfile):
@@ -30,22 +31,13 @@ def visbuf(logfile):
       blah,time,name,bufsz,buflen,blah = line.split(',')
       if name not in links:
         links[name] = [[],[],[]]
-      links[name][0].append(time)
-      links[name][1].append(bufsz)
-      links[name][2].append(buflen)
+      links[name][0].append(float(time))
+      links[name][1].append(int(bufsz))
+      links[name][2].append(int(buflen))
+  f.close()
   return links
 
-sname = 'test2_reno.log'
-
-links = visbuf(sname)
-for link in links:
-  links[link] = np.array(links[link])
-
-flows = viscwn(sname)
-for flow in flows:
-  flows[flow] = np.array(flows[flow])
-
-def plotlink(nm,j,ylabel='Buffer data (bytes)'):
+def plotlink(links, nm, j, ylabel='Buffer data (bytes)'):
   i=0
   if isinstance(nm,list):
     for n in nm:
@@ -57,7 +49,7 @@ def plotlink(nm,j,ylabel='Buffer data (bytes)'):
   plt.xlabel('time (s)')
   plt.ylabel(ylabel)
 
-def plotflow(nm,j,ylabel='Congestion Window Size',state=False):
+def plotflow(flows, nm, j, ylabel='Congestion Window Size', state=False):
   i=0
 
   if state and not isinstance(nm,list):
@@ -91,18 +83,44 @@ def plotflow(nm,j,ylabel='Congestion Window Size',state=False):
     plt.legend()
   plt.xlabel('time (s)')
   plt.ylabel(ylabel)
-  plt.show()
+  return plt.gca()
+
+def main(logfile, flow_names=None, link_names=None, output_prefix=None):
+  """Plot congestion-window and link-buffer measurements from a simulator log."""
+  links = visbuf(logfile)
+  for link in links:
+    links[link] = np.array(links[link])
+
+  flows = viscwn(logfile)
+  for flow in flows:
+    # Keep the state column as strings while retaining numeric plot data.
+    flows[flow] = [np.asarray(column) for column in flows[flow]]
+
+  flow_names = flow_names or sorted(flows)
+  link_names = link_names or sorted(links)
+
+  # Flow column 1 is congestion window size.
+  plotflow(flows, flow_names, 1)
+  plt.tight_layout()
+  if output_prefix:
+    plt.savefig(output_prefix + '_cwnd.png', dpi=150)
+  # Link column 1 is buffer data in bytes.
+  plt.figure()
+  plotlink(links, link_names, 1)
+  plt.tight_layout()
+  if output_prefix:
+    plt.savefig(output_prefix + '_buffers.png', dpi=150)
+  else:
+    plt.show()
 
 
-# 1 : congestion window
-# 2 : data left to send
-# 3 : round trip time
-# 4 : throughput
-whattoplot = 1
-plotflow(['F1','F2','F3'],whattoplot)
+if __name__ == '__main__':
+  import argparse
 
-plt.figure()
-# 1 : amount of data in buffer
-# 2 : # packets in the buffer
-whattoplot = 1
-plotlink(['L1','L2'],whattoplot)
+  parser = argparse.ArgumentParser(description='Plot measurements from a simulator log')
+  parser.add_argument('logfile')
+  parser.add_argument('--flows', nargs='+', help='flow names to plot (default: all)')
+  parser.add_argument('--links', nargs='+', help='link names to plot (default: all)')
+  parser.add_argument('--output-prefix', help='save <prefix>_cwnd.png and <prefix>_buffers.png')
+  args = parser.parse_args()
+  main(args.logfile, args.flows, args.links, args.output_prefix)

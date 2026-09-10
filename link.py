@@ -32,7 +32,7 @@ class Link:
       self.buffer.append((packet,self.getOtherNode(fromNode)))
       self.bufdata += len(packet)
     else:
-      print "DROP,%f,%s,%s->%s" % (self.env.now,self.name,packet.getSrc(),packet.getDest())
+      print("DROP,%f,%s,%s->%s" % (self.env.now,self.name,packet.getSrc(),packet.getDest()))
       pass
 
   def linkDelay(self,datasize):
@@ -57,7 +57,7 @@ class Link:
       yield self.env.timeout(self.propdelay)
 
       link_otherNode.dataDelivery(link_packet)
-      print "BUF,%f,%s,%d,%d,%s->%s" % (self.env.now,self.name,self.bufdata,len(self.buffer),link_packet.getSrc(),link_packet.getDest())
+      print("BUF,%f,%s,%d,%d,%s->%s" % (self.env.now,self.name,self.bufdata,len(self.buffer),link_packet.getSrc(),link_packet.getDest()))
 
 class Packet:
   def __init__(self,pktsize,flow,data=[],loginfo=[]):
